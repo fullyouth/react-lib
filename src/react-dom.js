@@ -14,7 +14,12 @@ function createDOM(vdom) {
     return document.createTextNode(vdom)
   }
   let { type, props } = vdom
-  let dom = document.createElement(type)
+  let dom
+  if (typeof type === 'function') {
+    return mountFunctionComponent(vdom)
+  } else {
+    dom = document.createElement(type)
+  }
   // 更新属性
   updateProps(dom, props)
   // 插入儿子
@@ -28,6 +33,11 @@ function createDOM(vdom) {
     document.textContent = props.children ? props.children.toString() : "";
   }
   return dom
+}
+
+function mountFunctionComponent(vdom) {
+  let renderVdom = vdom.type(vdom.props)
+  return createDOM(renderVdom)
 }
 
 function reconcileChildren(childrenVdom, parentDOM) {
